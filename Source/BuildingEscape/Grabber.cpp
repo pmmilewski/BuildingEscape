@@ -21,7 +21,27 @@ void UGrabber::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber is reporting for duty!"))
 	// ...
-	
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+
+	if(PhysicsHandle)
+	{
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("PhysicsHandle not found in %s!"), *GetOwner()->GetName());
+	}
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	if (InputComponent)
+	{
+		InputComponent->BindAction();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InputComponent not found in %s!"), *GetOwner()->GetName());
+	}
 }
 
 
