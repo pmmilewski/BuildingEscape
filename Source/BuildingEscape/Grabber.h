@@ -32,7 +32,16 @@ private:
 	float Reach = 100.f;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
+	FVector LineTraceEnd;
 
+	void FindPhysicsHandleComponent();
+	void SetupInputComponent();
+	void UpdateLineTraceEnd();
+	FHitResult GetFirstPhysicsBodyInReach();
+
+	// Ray-cast and grab what's in reach
+	void Grab();
+	void Release();
 		
 	
 };
