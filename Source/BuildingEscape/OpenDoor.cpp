@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "OpenDoor.h"
-
+#define OUT
 
 
 // Sets default values for this component's properties
@@ -15,22 +15,14 @@ UOpenDoor::UOpenDoor()
 }
 
 
-void UOpenDoor::OpenDoor()
-{
-	Owner->SetActorRotation(Owner->GetActorRotation() + FRotator(0.f, OpenedDoorAngle, 0.f));
-}
-
-void UOpenDoor::CloseDoor()
-{
-	Owner->SetActorRotation(Owner->GetActorRotation() - FRotator(0.f, OpenedDoorAngle, 0.f));
-}
-
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
-	Owner = GetOwner();
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if(PressurePlate == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pressure Plate not set!"));
+	}
 }
 
 
@@ -39,23 +31,28 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens) && !IsOpened && LeftPressurePlate)
+	if (PressurePlate == nullptr){ return;}
+	if (GetTotalMassOnPressurePlate() > TriggerMass)
 	{
-		OpenDoor();
-		IsOpened = true;
-		LeftPressurePlate = false;
-		LastTimeOpened = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
+	else
+	{
+		OnClose.Broadcast();
+	}
+}
 
-	if (PressurePlate && !PressurePlate->IsOverlappingActor(ActorThatOpens))
-	{
-		LeftPressurePlate = true;
-	}
+float UOpenDoor::GetTotalMassOnPressurePlate()
+{
+	float TotalMass = 0.f;
+	if (PressurePlate == nullptr){ return TotalMass;}
+	TArray<AActor*> ActorsOnPressurePlate;
+	PressurePlate->GetOverlappingActors(OUT ActorsOnPressurePlate);
 
-	if (GetWorld()->GetTimeSeconds() - LastTimeOpened > CloseDelayTime && IsOpened)
+	for(const auto& Actor : ActorsOnPressurePlate)
 	{
-		CloseDoor();
-		IsOpened = false;
+		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
+	return TotalMass;
 }
 

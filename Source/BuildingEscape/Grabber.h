@@ -36,7 +36,7 @@ private:
 
 	void FindPhysicsHandleComponent();
 	void SetupInputComponent();
-	void UpdateLineTraceEnd();
+	FVector UpdateLineTraceEndAndGetPlayerViewPointLocation();
 	FHitResult GetFirstPhysicsBodyInReach();
 
 	// Ray-cast and grab what's in reach
